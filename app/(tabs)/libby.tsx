@@ -1,11 +1,36 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Image, StyleSheet, Platform, TextInput } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { MultiStepForm } from '@/components/multi-step-form/MultiStepForm';
 
 export default function HomeScreen() {
+
+  const steps = [
+    <ThemedView style={styles.step}>
+      <ThemedText>Contact Details</ThemedText>
+      <TextInput placeholder="Name" style={styles.input} />
+      <TextInput placeholder="Address" style={styles.input} />
+      <TextInput placeholder="Email" style={styles.input} />
+    </ThemedView>,
+    <ThemedView style={styles.step}>
+      <ThemedText>Payment Details</ThemedText>
+      <TextInput placeholder="Card Number" style={styles.input} />
+      <TextInput placeholder="Secret" style={styles.input} />
+      <TextInput placeholder="Expiration Date" style={styles.input} />
+    </ThemedView>,
+  ];
+
+  const handleCancel = () => {
+    console.log('Form canceled');
+  };
+
+  const handleSubmit = () => {
+    console.log('Form submitted');
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -19,6 +44,7 @@ export default function HomeScreen() {
         <ThemedText type="title">Libby</ThemedText>
         <HelloWave />
       </ThemedView>
+      <MultiStepForm steps={steps} onCancel={handleCancel} onSubmit={handleSubmit} />
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
@@ -70,5 +96,18 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  step: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  input: {
+    width: '80%',
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 10,
+    borderRadius: 5,
   },
 });
