@@ -1,4 +1,4 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import { StyleSheet, Image, Platform, SafeAreaView } from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -6,6 +6,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import Bookshelf from '@/components/Bookshelf';
 
 export default function TabTwoScreen() {
   return (
@@ -19,6 +20,9 @@ export default function TabTwoScreen() {
           style={styles.headerImage}
         />
       }>
+      <SafeAreaView style={styles.container}>
+        <Bookshelf />
+      </SafeAreaView>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Explore</ThemedText>
       </ThemedView>
@@ -105,5 +109,8 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+  },
+  container: {
+    flex: 1,
   },
 });
