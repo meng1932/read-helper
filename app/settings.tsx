@@ -55,7 +55,7 @@ const SettingsPage = () => {
       />
       <Text style={styles.label}>Notion Database ID</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { marginBottom: 20 }]}
         value={notionDatabaseId}
         onChangeText={setNotionDatabaseId}
         placeholder="Enter your Notion Database ID"

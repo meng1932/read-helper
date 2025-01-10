@@ -6,21 +6,37 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { ThemedView } from '@/components/ui/ThemedView';
 import { MultiStepForm } from '@/components/multi-step-form/MultiStepForm';
 import BookSelector from '@/components/common/BookSelector';
-import { TABS } from '@/types';
+import { TABS, TABS_FORM_STORAGE_KEY_MAP } from '@/types';
+import { useState } from 'react';
+import { useAsyncStorageGet } from '@/hooks/useAsyncStorage';
+import { toQuoteBlock, toTimeChapterBlock, toNoteBlock, toDividerBlock } from '@/components/helper/notion';
+import { useUpdateNotionPageContent } from '@/hooks/useUpdateNotionPage';
 
-export default function HomeScreen() {
+interface BookTabData {
+  notionPageId?: string;
+}
+
+export default function BookScreen() {
+  const [quote, setQuote] = useState("")
+  const [comment, setComment] = useState("")
+  const [chapterName, setChapterName] = useState("")
+  const { data: bookTabData, loading, error: loadingNotionPageId } = useAsyncStorageGet<BookTabData>(TABS_FORM_STORAGE_KEY_MAP[TABS.PHYSICAL_BOOK]);
+  const { updatePageContentById, loading: updatingNotion, error: updateNotionError } = useUpdateNotionPageContent();
+
 
   const steps = [
     <ThemedView style={styles.step}>
       <ThemedText>Select a book</ThemedText>
-      <BookSelector tab={TABS.PHYSICAL_BOOK}/>
+      <BookSelector tab={TABS.PHYSICAL_BOOK} />
     </ThemedView>,
     <ThemedView style={styles.step}>
-      <ThemedText>Payment Details</ThemedText>
-      <TextInput placeholder="Card Number" style={styles.input} />
-      <TextInput placeholder="Secret" style={styles.input} />
-      <TextInput placeholder="Expiration Date" style={styles.input} />
+      <ThemedText>Edit the quote</ThemedText>
+      <TextInput style={styles.input} value={quote} onChangeText={(value) => setQuote(value)} />
     </ThemedView>,
+    <ThemedView style={styles.step}>
+      <ThemedText>Edit your comment</ThemedText>
+      <TextInput style={styles.input} value={comment} onChangeText={(value) => setComment(value)} />
+    </ThemedView>
   ];
 
   const handleCancel = () => {
@@ -28,55 +44,24 @@ export default function HomeScreen() {
   };
 
   const handleSubmit = () => {
-    console.log('Form submitted');
+    if (bookTabData?.notionPageId && bookTabData?.notionPageId.length) {
+      console.log('Form submitted:', { quote, comment, notionPageId: bookTabData.notionPageId });
+      //add to current
+      const blocksToPush = []
+      blocksToPush.push(toQuoteBlock(quote))
+      blocksToPush.push(toTimeChapterBlock(chapterName))
+      if (comment.length) {
+        blocksToPush.push(toNoteBlock(comment))
+      }
+      blocksToPush.push(toDividerBlock())
+      updatePageContentById(bookTabData.notionPageId, blocksToPush)
+    } else {
+      //create a new page
+    }
   };
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Libby</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <MultiStepForm steps={steps} onCancel={handleCancel} onSubmit={handleSubmit} />
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <MultiStepForm steps={steps} onCancel={handleCancel} onSubmit={handleSubmit} />
   );
 }
 

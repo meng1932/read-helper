@@ -1,8 +1,7 @@
 import { Client } from "@notionhq/client"
 import { BOOKSHELF_TEMPLATE_DEV, NOTION_PAGE } from "../constants/notion.constants.dev"
 import { NOTION_PAGE_TYPE } from "../constants/notion.constants"
-import { CreateNotionPageDto, INotionRichTextObject, NOTION_BLOCK_TYPE, NOTION_COLORS, NotionBlock } from "../types/notion"
-import { ILibbyReadingNotes } from "../types/libby"
+import { INotionRichTextObject, NOTION_BLOCK_TYPE, NOTION_COLORS, NotionBlock } from "../../types/notion"
 
 export default class NotionService {
   notion: Client
@@ -64,7 +63,6 @@ export default class NotionService {
   }
 
   // Create bookshelf
-
   createNotionBookShelf = async (parentPageId: string, bookshelfName?: string) => {
     /**
      * @param parentPageId unique ID in Notion, where the DB should be created under
