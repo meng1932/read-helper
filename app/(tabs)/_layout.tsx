@@ -2,13 +2,14 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
-import { HapticTab } from '@/components/HapticTab';
+import { HapticTab } from '@/components/common/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { TABS } from '@/types';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -43,21 +44,21 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="book"
+        name={TABS.PHYSICAL_BOOK}
         options={{
           title: 'Book',
           tabBarIcon: ({ color }) => <Feather name="book-open" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="libby"
+        name={TABS.LIBBY}
         options={{
           title: 'Libby',
           tabBarIcon: ({ color }) => <MaterialIcons name="face" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="weread"
+        name={TABS.WEREAD}
         options={{
           title: 'Weread',
           tabBarIcon: ({ color }) => <FontAwesome name="wechat" size={28} color={color} />

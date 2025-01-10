@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
   TextInput,
   Button,
   FlatList,
@@ -10,6 +8,8 @@ import {
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ThemedView } from './ui/ThemedView';
+import { ThemedText } from './ui/ThemedText';
 
 interface Book {
   name: string;
@@ -72,9 +72,9 @@ export default function Bookshelf() {
   };
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       {/* Add Book Section */}
-      <View style={styles.addBookContainer}>
+      <ThemedView style={styles.addBookContainer}>
         <TextInput
           style={styles.input}
           placeholder="Book Name"
@@ -88,34 +88,34 @@ export default function Bookshelf() {
           onChangeText={setNotionUrl}
         />
         <Button title="Add Book" onPress={addBook} />
-      </View>
+      </ThemedView>
 
       {/* Book List Section */}
-      <View style={styles.bookListContainer}>
+      <ThemedView style={styles.bookListContainer}>
         {books.length === 0 ? (
-          <Text style={styles.emptyMessage}>Please add a book to your bookshelf.</Text>
+          <ThemedText style={styles.emptyMessage}>Please add a book to your bookshelf.</ThemedText>
         ) : (
           <FlatList
             data={books}
             keyExtractor={(item, index) => `${item.name}-${index}`}
             renderItem={({ item, index }) => (
-              <View style={styles.bookItem}>
-                <View>
-                  <Text style={styles.bookName}>{item.name}</Text>
-                  <Text style={styles.bookUrl}>{item.url}</Text>
-                </View>
+              <ThemedView style={styles.bookItem}>
+                <ThemedView>
+                  <ThemedText style={styles.bookName}>{item.name}</ThemedText>
+                  <ThemedText style={styles.bookUrl}>{item.url}</ThemedText>
+                </ThemedView>
                 <TouchableOpacity
                   onPress={() => deleteBook(index)}
                   style={styles.deleteButton}
                 >
-                  <Text style={styles.deleteText}>Delete</Text>
+                  <ThemedText style={styles.deleteText}>Delete</ThemedText>
                 </TouchableOpacity>
-              </View>
+              </ThemedView>
             )}
           />
         )}
-      </View>
-    </View>
+      </ThemedView>
+    </ThemedView>
   );
 }
 
