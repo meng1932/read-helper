@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Book, TABS, TABS_FORM_STORAGE_KEY_MAP } from '@/types';
 import { ThemedView } from '../ui/ThemedView';
 import { useAsyncStorageGet, useAsyncStorageUpdate } from '@/hooks/useAsyncStorage';
@@ -32,7 +32,7 @@ const BookSelector = ({ tab }: IBookSelector) => {
     };
 
     return (loading ? <ActivityIndicator /> :
-        <ThemedView style={styles.container}>
+        <View style={styles.container}>
             {books.length === 0 ? (
                 <Text style={styles.emptyText}>Please add books to your bookshelf.</Text>
             ) : (
@@ -53,7 +53,7 @@ const BookSelector = ({ tab }: IBookSelector) => {
                     )}
                 />
             )}
-        </ThemedView>
+        </View>
     );
 };
 

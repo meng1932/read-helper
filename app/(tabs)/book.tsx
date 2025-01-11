@@ -72,12 +72,14 @@ export default function BookScreen() {
   };
 
   const handleSubmit = () => {
+    
     if (bookTabData?.notionPageId && bookTabData?.notionPageId.length) {
       console.log("Form submitted:", {
         quote,
         comment,
         notionPageId: extractPageId(bookTabData.notionPageId),
       });
+      const extractedNotionPageId=extractPageId(bookTabData.notionPageId)
       //add to current
       const blocksToPush = [];
       blocksToPush.push(toQuoteBlock(quote));
@@ -86,7 +88,7 @@ export default function BookScreen() {
         blocksToPush.push(toNoteBlock(comment));
       }
       blocksToPush.push(toDividerBlock());
-      updateNotionPage(bookTabData.notionPageId, blocksToPush);
+      updateNotionPage(extractedNotionPageId||"", blocksToPush);
     } else {
       //create a new page
     }
