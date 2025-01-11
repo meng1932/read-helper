@@ -6,8 +6,6 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import 'react-native-polyfill-globals/auto';
-//Since Expo apps run in a React Native environment, you may need to polyfill some Node.js modules, such as stream or buffer, which are used internally by node-fetch.
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.

@@ -1,33 +1,51 @@
-import { useState } from 'react';
-import { Client } from '@notionhq/client';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NotionBlock } from "@/types/notion";
+import axios from "axios";
 
-export const useUpdateNotionPageContent = () => {
-  const [loading, setLoading] = useState(false);
+const useNotionUpdate = (options?:object) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<any | null>(null);
 
-  const updatePageContentById = async (pageId: string, content: any) => {
-    /**
-     * @param pageId unique ID in Notion,
-     * this page or the parent page should be connected to this APP.
-     * @param content content to append to the page.
-     */
-    setLoading(true);
+  const mutateAsync = async (pageId: string, blocksToAdd: NotionBlock[]) => {
+    const storedApiKey = await AsyncStorage.getItem("NOTION_API_KEY");
+    if (!storedApiKey) {
+      setError("API key is missing.");
+      return;
+    }
+
+    setIsLoading(true);
     setError(null);
+    //https://cors-anywhere.herokuapp.com/corsdemo
+    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+    const notionApiUrl = `https://api.notion.com/v1/blocks/${pageId}/children`;
+    const url = proxyUrl + notionApiUrl;
+
+    const headers: HeadersInit = {
+      Authorization: `Bearer ${storedApiKey}`,
+      "Content-Type": "application/json",
+      "Notion-Version": "2022-06-28",
+    };
 
     try {
-      const storedNotionApiKey = await AsyncStorage.getItem('NOTION_API_KEY');
-      const notion = new Client({ auth: storedNotionApiKey || "" });
-      await notion.blocks.children.append({
-        block_id: pageId,
-        children: content,
-      });
-    } catch (err: any) {
-      setError(err.message || 'Failed to update page content');
+      console.log("blocksToAdd", blocksToAdd);
+      const response = await axios.patch(
+        url,
+        { children: blocksToAdd },
+        { headers }
+      );
+      //if(options?.onSuccess){}
+
+      setData(response.data);
+    } catch (err) {
+      setError((err as Error).message || "An error occurred");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  return { updatePageContentById, loading, error };
+  return { isLoading, error, data, mutateAsync };
 };
+
+export default useNotionUpdate;
