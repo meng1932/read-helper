@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NotionBlock } from "@/types/notion";
 import axios, { AxiosError } from "axios";
+import { Alert } from "react-native";
 
-const useNotionUpdate = (options?:object) => {
+interface Options {
+  onSuccess?: (data: any) => void;
+}
+
+const useNotionUpdate = (options?: Options) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<AxiosError |any| null>(null);
   const [data, setData] = useState<any | null>(null);
@@ -29,11 +34,20 @@ const useNotionUpdate = (options?:object) => {
         url,
         { children: blocksToAdd },
         { headers }
-      )
-      setData(response.data);
-    } catch (err) {
-      console.error('Error:',(error as AxiosError)?.response?.data);
-      setError(err);
+      );
+      if (options?.onSuccess) {
+        options.onSuccess(response?.data);
+      }
+
+      setData(response?.data);
+      Alert.alert(
+        "Submitted",
+        "Congratulations! Your data has been submitted successfully."
+      );
+    } catch (err: any) {
+      setError((err as Error).message || "An error occurred");
+      console.error("here is the error: ",err,err?.response?.data || "An error occurred");
+      Alert.alert("Error", "An error occurred");
     } finally {
       setIsLoading(false);
     }
