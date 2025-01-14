@@ -2,9 +2,9 @@
   "expo": {
     "name": "read-helper",
     "slug": "read-helper",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/app_icon_1024x1024.png", 
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
