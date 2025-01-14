@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Button, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Button, StyleSheet } from "react-native";
 
 interface StepWrapperProps {
   children: React.ReactNode;
@@ -36,15 +36,12 @@ export const StepWrapper: React.FC<StepWrapperProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
+    /*    justifyContent: "space-between",
+    padding: 20, */
   },
-  content: {
-    flex: 1,
-  },
+  content: {},
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });

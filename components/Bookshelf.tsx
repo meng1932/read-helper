@@ -73,6 +73,8 @@ const Bookshelf = () => {
       Alert.alert("Error", "Both fields are required.");
       return;
     }
+    setBookName("")
+    setNotionUrl("")
     const newBook: Book = { name: bookName.trim(), url: notionUrl.trim() };
     updateBookShelf(STORAGE_KEY, {
       books: [...(bookshelfData?.books || []), newBook],

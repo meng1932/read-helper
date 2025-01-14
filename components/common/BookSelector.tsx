@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Book, TABS, TABS_FORM_STORAGE_KEY_MAP } from '@/types';
-import { ThemedView } from '../ui/ThemedView';
 import { useAsyncStorageGet, useAsyncStorageUpdate } from '@/hooks/useAsyncStorage';
 
 export interface IBookSelector {
