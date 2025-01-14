@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   TextInput,
   Button,
@@ -6,22 +6,54 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ThemedView } from './ui/ThemedView';
-import { ThemedText } from './ui/ThemedText';
+  View,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ThemedView } from "./ui/ThemedView";
+import { ThemedText } from "./ui/ThemedText";
+import { VStack } from "@/components/ui/vstack";
 
 interface Book {
   name: string;
   url: string;
 }
 
-export default function Bookshelf() {
-  const [books, setBooks] = useState<Book[]>([]);
-  const [bookName, setBookName] = useState('');
-  const [notionUrl, setNotionUrl] = useState('');
+const BookList = ({
+  books,
+  deleteBook,
+}: {
+  books: Book[];
+  deleteBook: (index: number) => void;
+}) => {
+  return (
+    <VStack space="md">
+      {books.map((item, index) => (
+        <View
+          key={`${item.name}-${index}`}
+          style={styles.bookItem} // Apply custom styles if needed
+        >
+          <View style={styles.bookInfo}>
+            <ThemedText>{item.name}</ThemedText>
+            <ThemedText style={styles.bookUrl}>{item.url}</ThemedText>
+          </View>
+          <TouchableOpacity
+            onPress={() => deleteBook(index)}
+            style={styles.deleteButton}
+          >
+            <ThemedText style={styles.deleteText}>Delete</ThemedText>
+          </TouchableOpacity>
+        </View>
+      ))}
+    </VStack>
+  );
+};
 
-  const STORAGE_KEY = '@bookshelf';
+const Bookshelf = () => {
+  const [books, setBooks] = useState<Book[]>([]);
+  const [bookName, setBookName] = useState("");
+  const [notionUrl, setNotionUrl] = useState("");
+
+  const STORAGE_KEY = "@bookshelf";
 
   // Load books from AsyncStorage on mount
   useEffect(() => {
@@ -32,7 +64,7 @@ export default function Bookshelf() {
           setBooks(JSON.parse(storedBooks));
         }
       } catch (error) {
-        console.error('Failed to load books:', error);
+        console.error("Failed to load books:", error);
       }
     };
 
@@ -45,7 +77,7 @@ export default function Bookshelf() {
       try {
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(books));
       } catch (error) {
-        console.error('Failed to save books:', error);
+        console.error("Failed to save books:", error);
       }
     };
 
@@ -55,14 +87,14 @@ export default function Bookshelf() {
   // Add a book to the list
   const addBook = () => {
     if (!bookName.trim() || !notionUrl.trim()) {
-      Alert.alert('Error', 'Both fields are required.');
+      Alert.alert("Error", "Both fields are required.");
       return;
     }
 
     const newBook: Book = { name: bookName.trim(), url: notionUrl.trim() };
     setBooks([...books, newBook]);
-    setBookName('');
-    setNotionUrl('');
+    setBookName("");
+    setNotionUrl("");
   };
 
   // Remove a book from the list
@@ -91,86 +123,76 @@ export default function Bookshelf() {
       </ThemedView>
 
       {/* Book List Section */}
-      <ThemedView style={styles.bookListContainer}>
-        {books.length === 0 ? (
-          <ThemedText style={styles.emptyMessage}>Please add a book to your bookshelf.</ThemedText>
-        ) : (
-          <FlatList
-            data={books}
-            keyExtractor={(item, index) => `${item.name}-${index}`}
-            renderItem={({ item, index }) => (
-              <ThemedView style={styles.bookItem}>
-                <ThemedView>
-                  <ThemedText style={styles.bookName}>{item.name}</ThemedText>
-                  <ThemedText style={styles.bookUrl}>{item.url}</ThemedText>
-                </ThemedView>
-                <TouchableOpacity
-                  onPress={() => deleteBook(index)}
-                  style={styles.deleteButton}
-                >
-                  <ThemedText style={styles.deleteText}>Delete</ThemedText>
-                </TouchableOpacity>
-              </ThemedView>
-            )}
-          />
-        )}
-      </ThemedView>
+      {books.length === 0 ? (
+        <ThemedText style={styles.emptyMessage}>
+          Please add a book to your bookshelf.
+        </ThemedText>
+      ) : (
+        <BookList books={books} deleteBook={deleteBook} />
+      )}
     </ThemedView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: "#f8f8f8",
   },
   addBookContainer: {
     marginBottom: 20,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
+  },
+  bookInfo: {
+    flex: 1, // Ensures the text occupies available space
+    marginRight: 10, // Adds space between the text and the delete button
   },
   bookListContainer: {
     flex: 1,
   },
   emptyMessage: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 16,
-    color: '#888',
+    color: "#888",
     marginTop: 20,
   },
   bookItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    backgroundColor: '#fff',
+    borderBottomColor: "#ccc",
+    backgroundColor: "#fff",
     borderRadius: 5,
     marginBottom: 10,
   },
   bookName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   bookUrl: {
     fontSize: 14,
-    color: '#555',
+    color: "gray",
+    flexWrap: 'wrap', // Allows the text to wrap if necessary
   },
   deleteButton: {
-    backgroundColor: '#ff5c5c',
-    padding: 10,
-    borderRadius: 5,
+    padding: 8,
+    backgroundColor: "red",
+    borderRadius: 4,
   },
   deleteText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
 });
+
+export default Bookshelf;
