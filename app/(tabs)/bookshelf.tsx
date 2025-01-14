@@ -1,9 +1,8 @@
 import { StyleSheet, Image, Platform, SafeAreaView } from "react-native";
 import ParallaxScrollView from "@/components/common/ParallaxScrollView";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import Bookshelf from "@/components/Bookshelf";
 
-export default function TabTwoScreen() {
+export default function BookshelfScreen() {
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
@@ -26,10 +25,6 @@ const styles = StyleSheet.create({
     height: 250,
     width: "100%",
     position: "absolute",
-  },
-  titleContainer: {
-    flexDirection: "row",
-    gap: 8,
   },
   container: {
     flex: 1,

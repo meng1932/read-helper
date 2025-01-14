@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   TextInput,
-  Button,
-  FlatList,
   TouchableOpacity,
   StyleSheet,
   Alert,
   View,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
 import { ThemedView } from "./ui/ThemedView";
 import { ThemedText } from "./ui/ThemedText";
 import { VStack } from "@/components/ui/vstack";
+import {
+  useAsyncStorageGet,
+  useAsyncStorageUpdate,
+} from "@/hooks/useAsyncStorage";
+import { IBooskshelfData } from "@/types/async-storage";
+import { colors } from "./ui/colors";
 
 interface Book {
   name: string;
@@ -49,40 +53,19 @@ const BookList = ({
 };
 
 const Bookshelf = () => {
-  const [books, setBooks] = useState<Book[]>([]);
   const [bookName, setBookName] = useState("");
   const [notionUrl, setNotionUrl] = useState("");
 
   const STORAGE_KEY = "@bookshelf";
 
-  // Load books from AsyncStorage on mount
-  useEffect(() => {
-    const loadBooks = async () => {
-      try {
-        const storedBooks = await AsyncStorage.getItem(STORAGE_KEY);
-        if (storedBooks) {
-          setBooks(JSON.parse(storedBooks));
-        }
-      } catch (error) {
-        console.error("Failed to load books:", error);
-      }
-    };
+  const {
+    data: bookshelfData,
+    loading: isBookshelfLoading,
+    reload: reloadBookshelf,
+  } = useAsyncStorageGet<IBooskshelfData>(STORAGE_KEY);
 
-    loadBooks();
-  }, []);
-
-  // Save books to AsyncStorage whenever the list changes
-  useEffect(() => {
-    const saveBooks = async () => {
-      try {
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(books));
-      } catch (error) {
-        console.error("Failed to save books:", error);
-      }
-    };
-
-    saveBooks();
-  }, [books]);
+  const { updateData: updateBookShelf, loading: isUpdatingBookshelf } =
+    useAsyncStorageUpdate({ onSuccess: reloadBookshelf });
 
   // Add a book to the list
   const addBook = () => {
@@ -90,17 +73,20 @@ const Bookshelf = () => {
       Alert.alert("Error", "Both fields are required.");
       return;
     }
-
     const newBook: Book = { name: bookName.trim(), url: notionUrl.trim() };
-    setBooks([...books, newBook]);
-    setBookName("");
-    setNotionUrl("");
+    updateBookShelf(STORAGE_KEY, {
+      books: [...(bookshelfData?.books || []), newBook],
+    });
   };
 
   // Remove a book from the list
   const deleteBook = (index: number) => {
-    const updatedBooks = books.filter((_, i) => i !== index);
-    setBooks(updatedBooks);
+    const updatedBooks = (bookshelfData?.books || []).filter(
+      (_, i) => i !== index
+    );
+    updateBookShelf(STORAGE_KEY, {
+      books: updatedBooks,
+    });
   };
 
   return (
@@ -119,16 +105,35 @@ const Bookshelf = () => {
           value={notionUrl}
           onChangeText={setNotionUrl}
         />
-        <Button title="Add Book" onPress={addBook} />
+        {isUpdatingBookshelf ? (
+          <Button className="p-3" isDisabled>
+            <ButtonSpinner color={colors.gray[400]} />
+            <ButtonText className="font-medium text-sm ml-2">
+              Adding books...
+            </ButtonText>
+          </Button>
+        ) : (
+          <Button className="p-3" onPress={addBook}>
+            <ButtonText className="font-medium text-sm ml-2">
+              Add Book
+            </ButtonText>
+          </Button>
+        )}
       </ThemedView>
 
       {/* Book List Section */}
-      {books.length === 0 ? (
+
+      {isBookshelfLoading && (
+        <ThemedText style={styles.emptyMessage}>
+          Loading bookshelf...
+        </ThemedText>
+      )}
+      {bookshelfData?.books?.length === 0 ? (
         <ThemedText style={styles.emptyMessage}>
           Please add a book to your bookshelf.
         </ThemedText>
       ) : (
-        <BookList books={books} deleteBook={deleteBook} />
+        <BookList books={bookshelfData?.books || []} deleteBook={deleteBook} />
       )}
     </ThemedView>
   );
@@ -182,7 +187,7 @@ const styles = StyleSheet.create({
   bookUrl: {
     fontSize: 14,
     color: "gray",
-    flexWrap: 'wrap', // Allows the text to wrap if necessary
+    flexWrap: "wrap", // Allows the text to wrap if necessary
   },
   deleteButton: {
     padding: 8,

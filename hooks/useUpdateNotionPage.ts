@@ -3,12 +3,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NotionBlock } from "@/types/notion";
 import axios, { AxiosError } from "axios";
 import { Alert } from "react-native";
+import { IOptions } from "@/types";
 
-interface Options {
-  onSuccess?: (data: any) => void;
-}
-
-const useNotionUpdate = (options?: Options) => {
+const useNotionUpdate = (options?: IOptions) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<AxiosError |any| null>(null);
   const [data, setData] = useState<any | null>(null);

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState, useEffect, useCallback } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { IOptions } from "@/types";
 
 /**
  * Hook for getting data from AsyncStorage
@@ -10,24 +11,30 @@ export const useAsyncStorageGet = <T>(storageKey: string) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const value = await AsyncStorage.getItem(storageKey);
-        setData(value ? JSON.parse(value) : null);
-      } catch (err) {
-        console.error(err);
-        setError(`Failed to load data from ${storageKey} storage.`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const value = await AsyncStorage.getItem(storageKey);
+      setData(value ? JSON.parse(value) : null);
+      setError(null); // Reset error on successful load
+    } catch (err) {
+      console.error(err);
+      setError(`Failed to load data from ${storageKey} storage.`);
+    } finally {
+      setLoading(false);
+    }
   }, [storageKey]);
 
-  return { data, loading, error };
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Expose the reload function
+  const reload = useCallback(() => {
+    loadData();
+  }, [loadData]);
+
+  return { data, loading, error, reload };
 };
 
 /**
@@ -35,7 +42,7 @@ export const useAsyncStorageGet = <T>(storageKey: string) => {
  * Includes fetching the current data, updating it, and saving it back.
  * @param storageKey - The key to update data in AsyncStorage
  */
-export const useAsyncStorageUpdate = () => {
+export const useAsyncStorageUpdate = (options?: IOptions) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,9 +51,14 @@ export const useAsyncStorageUpdate = () => {
     try {
       const currentData = await AsyncStorage.getItem(storageKey);
       const parsedCurrentData = currentData ? JSON.parse(currentData) : null;
-      const updatedData = parsedCurrentData ? { ...parsedCurrentData, ...newData } : newData;
+      const updatedData = parsedCurrentData
+        ? { ...parsedCurrentData, ...newData }
+        : newData;
       // Save the updated data back to AsyncStorage
       await AsyncStorage.setItem(storageKey, JSON.stringify(updatedData));
+      if(options?.onSuccess) {
+        options.onSuccess(updatedData);
+      }
       setError(null);
     } catch (err) {
       console.error(err);
