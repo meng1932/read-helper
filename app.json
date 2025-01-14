@@ -9,13 +9,19 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.meng1932.readhelper"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA"
+      ],
+      "package": "com.meng1932.readhelper"
     },
     "web": {
       "bundler": "metro",
@@ -51,6 +57,13 @@
     "experiments": {
       "typedRoutes": true
     },
-    "permissions": ["CAMERA"]
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d8a39a21-7efe-492b-870c-cfe6bc991ee3"
+      }
+    }
   }
 }
