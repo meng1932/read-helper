@@ -41,7 +41,7 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <ProgressBar currentStep={currentStep + 1} totalSteps={steps.length} />
       <StepWrapper
         onNext={handleNext}
@@ -57,5 +57,7 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    minHeight: 300,
+  },
 });

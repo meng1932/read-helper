@@ -10,6 +10,7 @@ import {
 import { Camera, CameraView, CameraType } from "expo-camera";
 import * as ImageManipulator from "expo-image-manipulator"; // Import ImageManipulator
 import * as FileSystem from "expo-file-system"; // Import FileSystem
+import { ButtonText, Button } from "./ui/button";
 
 const CameraWindow = ({
   capturedPhoto,
@@ -47,7 +48,7 @@ const CameraWindow = ({
       try {
         const photo = await cameraRef.current.takePictureAsync();
         const compressedPhoto = await compressImage(photo?.uri || "");
-       // console.log(`Compressed image size: ${compressedSize} bytes`); // Log the size  
+        // console.log(`Compressed image size: ${compressedSize} bytes`); // Log the size
         setCapturedPhoto(compressedPhoto || null);
         setIsCameraActive(false);
       } catch (error) {
@@ -56,30 +57,30 @@ const CameraWindow = ({
     }
   };
 
-  const compressImage = async (uri: string) => {  
-    try {  
-      const manipResult = await ImageManipulator.manipulateAsync(uri, [], {  
-        compress: 0.7,  
-        format: ImageManipulator.SaveFormat.JPEG,  
-      });  
-  
-      // Get file size  
-      const fileInfo = await FileSystem.getInfoAsync(manipResult.uri);  
-      const fileSizeInBytes = fileInfo.size;  
-      const fileSizeInKB = (fileSizeInBytes / 1024).toFixed(2);  
-      const fileSizeInMB = (fileSizeInBytes / (1024 * 1024)).toFixed(2);  
-  
-      console.log(`Compressed Image Size:`);  
-      console.log(`- Bytes: ${fileSizeInBytes}`);  
-      console.log(`- Kilobytes: ${fileSizeInKB} KB`);  
-      console.log(`- Megabytes: ${fileSizeInMB} MB`);  
-  
-      return manipResult.uri;  
-    } catch (error) {  
-      console.error("Error compressing image:", error);  
-      return null;  
-    }  
-  };  
+  const compressImage = async (uri: string) => {
+    try {
+      const manipResult = await ImageManipulator.manipulateAsync(uri, [], {
+        compress: 0.7,
+        format: ImageManipulator.SaveFormat.JPEG,
+      });
+
+      // Get file size
+      const fileInfo = await FileSystem.getInfoAsync(manipResult.uri);
+      const fileSizeInBytes = fileInfo.size;
+      const fileSizeInKB = (fileSizeInBytes / 1024).toFixed(2);
+      const fileSizeInMB = (fileSizeInBytes / (1024 * 1024)).toFixed(2);
+
+      console.log(`Compressed Image Size:`);
+      console.log(`- Bytes: ${fileSizeInBytes}`);
+      console.log(`- Kilobytes: ${fileSizeInKB} KB`);
+      console.log(`- Megabytes: ${fileSizeInMB} MB`);
+
+      return manipResult.uri;
+    } catch (error) {
+      console.error("Error compressing image:", error);
+      return null;
+    }
+  };
   // Start the camera
   const startCamera = async () => {
     await requestPermission();
@@ -87,9 +88,9 @@ const CameraWindow = ({
       setIsCameraActive(true);
     }
   };
-
-  
-
+  const discardPhoto = () => {
+    setCapturedPhoto(null);
+  };
   return (
     <View style={styles.container}>
       {isCameraActive ? (
@@ -120,9 +121,18 @@ const CameraWindow = ({
           {capturedPhoto && (
             <Image source={{ uri: capturedPhoto }} style={styles.preview} />
           )}
-          <TouchableOpacity style={styles.optionButton} onPress={startCamera}>
-            <Text style={styles.optionText}>Open Camera</Text>
-          </TouchableOpacity>
+          <View style={styles.actionBtns}>
+            {capturedPhoto && (
+              <Button className="p-3" onPress={discardPhoto}>
+                <ButtonText style={styles.buttonText}>Discard</ButtonText>
+              </Button>
+            )}
+            <Button className="p-3" onPress={startCamera}>
+              <ButtonText style={styles.buttonText}>
+                {capturedPhoto ? "Retake" : "Open Camera"}
+              </ButtonText>
+            </Button>
+          </View>
         </View>
       )}
     </View>
@@ -141,7 +151,6 @@ const styles = StyleSheet.create({
   },
   cameraControls: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "flex-end",
@@ -151,6 +160,14 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 10,
     borderRadius: 5,
+  },
+  actionBtns: {
+    paddingLeft: 30,
+    paddingRight: 30,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
   },
   controlText: {
     fontSize: 16,
@@ -175,6 +192,10 @@ const styles = StyleSheet.create({
     height: 200,
     marginBottom: 16,
     borderRadius: 10,
+  },
+  buttonText: {
+    fontSize: 12,
+    lineHeight: 12,
   },
 });
 

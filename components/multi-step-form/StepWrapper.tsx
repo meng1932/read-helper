@@ -52,7 +52,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 12,
   },
-  content: {},
+  content: {
+    minHeight: 325,
+  },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
