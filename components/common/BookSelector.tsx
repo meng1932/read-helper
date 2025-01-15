@@ -3,6 +3,7 @@ import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View }
 import { Book, TABS, TABS_FORM_STORAGE_KEY_MAP } from '@/types';
 import { useAsyncStorageGet, useAsyncStorageUpdate } from '@/hooks/useAsyncStorage';
 import { IBooskshelfData } from '@/types/async-storage';
+import { colors } from '../ui/colors';
 
 export interface IBookSelector {
     tab: TABS;
@@ -21,7 +22,7 @@ const BookSelector = ({ tab }: IBookSelector) => {
     // Load books from AsyncStorage
     useEffect(() => {
         if (bookshelf) {
-            setBooks(bookshelf.books||[]);
+            setBooks(bookshelf.books || []);
         }
     }, [bookshelf]);
 
@@ -31,41 +32,39 @@ const BookSelector = ({ tab }: IBookSelector) => {
         updateStorage(TABS_FORM_STORAGE_KEY_MAP[tab], { notionPageId: book.url });
     };
 
-    return (loading ? <ActivityIndicator /> :
-        <View style={styles.container}>
-            {books.length === 0 ? (
-                <Text style={styles.emptyText}>Please add books to your bookshelf.</Text>
-            ) : (
-                <FlatList
-                    data={books}
-                    keyExtractor={(item) => item.url}
-                    numColumns={2}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={[
-                                styles.card,
-                                selectedBook === item.url && styles.selectedCard,
-                            ]}
-                            onPress={() => handleSelection(item)}
-                        >
-                            <Text style={styles.cardText}>{item.name}</Text>
-                        </TouchableOpacity>
-                    )}
-                />
+    return loading ? (
+        <ActivityIndicator />
+    ) : (
+        <FlatList
+            contentContainerStyle={styles.container} // Use FlatList's own styling
+            data={books}
+            keyExtractor={(item) => item.url}
+            numColumns={1}
+            ListEmptyComponent={<Text style={styles.emptyText}>Please add books to your bookshelf.</Text>}
+            renderItem={({ item }) => (
+                <TouchableOpacity
+                    style={[
+                        styles.card,
+                        selectedBook === item.url && styles.selectedCard,
+                    ]}
+                    onPress={() => handleSelection(item)}
+                >
+                    <Text style={styles.cardText}>{item.name}</Text>
+                </TouchableOpacity>
             )}
-        </View>
+        />
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        padding: 16,
+        padding: 16, // Use padding for spacing
     },
     emptyText: {
         textAlign: 'center',
         fontSize: 16,
         color: '#888',
+        marginTop: 16,
     },
     card: {
         flex: 1,
@@ -77,25 +76,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     selectedCard: {
-        backgroundColor: '#cce5ff',
-        borderColor: '#007bff',
+        backgroundColor: colors.mutsu[200],
+        borderColor: colors.mutsu[400],
         borderWidth: 2,
     },
     cardText: {
         fontSize: 16,
         color: '#333',
-    },
-    addButton: {
-        marginTop: 16,
-        padding: 16,
-        backgroundColor: '#007bff',
-        borderRadius: 8,
-        alignItems: 'center',
-    },
-    addButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
     },
 });
 

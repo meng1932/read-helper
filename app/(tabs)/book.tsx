@@ -128,6 +128,7 @@ export default function BookScreen() {
         style={styles.headerImage}
       />
     }
+    //nestedScrollEnabled={true}
   >
    <SafeAreaView style={styles.container}>
       <MultiStepForm
@@ -179,6 +180,7 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 50,
+    height:'100%'
   },
   headerImage: {
     height: 250,
