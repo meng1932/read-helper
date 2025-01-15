@@ -179,7 +179,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   container: {
-    padding: 50,
     height:'100%'
   },
   headerImage: {

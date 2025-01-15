@@ -47,7 +47,6 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "space-between",
     width: "100%",
-    height: "100%",
   },
   buttonText: {
     fontSize: 12,
