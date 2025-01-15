@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Book, TABS, TABS_FORM_STORAGE_KEY_MAP } from '@/types';
 import { useAsyncStorageGet, useAsyncStorageUpdate } from '@/hooks/useAsyncStorage';
+import { IBooskshelfData } from '@/types/async-storage';
 
 export interface IBookSelector {
     tab: TABS;
@@ -12,7 +13,7 @@ const BookSelector = ({ tab }: IBookSelector) => {
     const [books, setBooks] = useState<Book[]>([]);
     const [selectedBook, setSelectedBook] = useState<string | null>(null);
 
-    const { data: bookshelf, loading, error: getBookshelfError } = useAsyncStorageGet<Book[]>('@bookshelf');
+    const { data: bookshelf, loading, error: getBookshelfError } = useAsyncStorageGet<IBooskshelfData>('@bookshelf');
     const { updateData: updateStorage, error: updateBookshelfError } = useAsyncStorageUpdate();
 
     if (getBookshelfError || updateBookshelfError) console.log(getBookshelfError || updateBookshelfError);
@@ -20,7 +21,7 @@ const BookSelector = ({ tab }: IBookSelector) => {
     // Load books from AsyncStorage
     useEffect(() => {
         if (bookshelf) {
-            setBooks(bookshelf);
+            setBooks(bookshelf.books||[]);
         }
     }, [bookshelf]);
 

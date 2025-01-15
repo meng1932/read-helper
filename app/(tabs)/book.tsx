@@ -16,6 +16,7 @@ import useNotionUpdate from "@/hooks/useUpdateNotionPage";
 import { extractPageId } from "@/helper/uuid";
 import CameraWindow from "@/components/Camera";
 import useOCR from "@/hooks/useGetOCR";
+import ParallaxScrollView from "@/components/common/ParallaxScrollView";
 
 interface BookTabData {
   notionPageId?: string;
@@ -119,7 +120,16 @@ export default function BookScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ParallaxScrollView
+    headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
+    headerImage={
+      <Image
+        source={require("@/assets/images/bookshelf-bg.png")}
+        style={styles.headerImage}
+      />
+    }
+  >
+   <SafeAreaView style={styles.container}>
       <MultiStepForm
         steps={steps}
         onCancel={handleCancel}
@@ -132,6 +142,8 @@ export default function BookScreen() {
         }}
       />
     </SafeAreaView>
+  </ParallaxScrollView>
+    
   );
 }
 
@@ -167,5 +179,10 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 50,
-  }
+  },
+  headerImage: {
+    height: 250,
+    width: "100%",
+    position: "absolute",
+  },
 });
