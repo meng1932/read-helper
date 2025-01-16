@@ -6,6 +6,7 @@ import { StepWrapper } from "./StepWrapper";
 interface MultiStepFormProps {
   steps: React.ReactNode[];
   onCancel: () => void;
+  isSubmitting:boolean;
   onSubmit: () => void;
   onStepChange?: (stepIndex: number) => void; // New optional prop
 }
@@ -13,6 +14,7 @@ interface MultiStepFormProps {
 export const MultiStepForm: React.FC<MultiStepFormProps> = ({
   steps,
   onCancel,
+  isSubmitting,
   onSubmit,
   onStepChange, // Added to destructuring
 }) => {
@@ -47,6 +49,7 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
         onNext={handleNext}
         onPrevious={handlePrevious}
         onCancel={onCancel}
+        isSubmitting={isSubmitting}
         isFirstStep={currentStep === 0}
         isLastStep={currentStep === steps.length - 1}
       >

@@ -35,18 +35,18 @@ export default function BookScreen() {
   const [comment, setComment] = useState("");
   const [chapterName, setChapterName] = useState("");
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
-  const {
-    data: bookTabData,
-    loading,
-    error: loadingNotionPageId,
-  } = useAsyncStorageGet<BookTabData>(
-    TABS_FORM_STORAGE_KEY_MAP[TABS.PHYSICAL_BOOK]
-  );
-  const {
-    mutateAsync: updateNotionPage,
-    isLoading: updatingNotion,
-    error: updateNotionError,
-  } = useNotionUpdate();
+  const { data: bookTabData, loading: loadingBookTabData } =
+    useAsyncStorageGet<BookTabData>(
+      TABS_FORM_STORAGE_KEY_MAP[TABS.PHYSICAL_BOOK]
+    );
+  const { mutateAsync: updateNotionPage, isLoading: updatingNotion } =
+    useNotionUpdate({
+      onSuccess: () => {
+        setQuote("");
+        setComment("");
+        setCapturedPhoto(null);
+      },
+    });
 
   const { mutateAsync: getOCR, isLoading: gettingOcr } = useOCR({
     onSuccess: (data) => {
@@ -66,7 +66,11 @@ export default function BookScreen() {
   const steps = [
     <ThemedView style={styles.step}>
       <ThemedText>Select a book</ThemedText>
-      <BookSelector tab={TABS.PHYSICAL_BOOK} />
+      {loadingBookTabData ? (
+        <ActivityIndicator></ActivityIndicator>
+      ) : (
+        <BookSelector tab={TABS.PHYSICAL_BOOK} />
+      )}
     </ThemedView>,
     <ThemedView style={styles.step}>
       <ThemedText>Select a picture</ThemedText>
@@ -150,6 +154,7 @@ export default function BookScreen() {
       <SafeAreaView style={styles.container}>
         <MultiStepForm
           steps={steps}
+          isSubmitting={updatingNotion}
           onCancel={handleCancel}
           onSubmit={handleSubmit}
           onStepChange={(stepIndex) => {
