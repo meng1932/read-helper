@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 
@@ -30,6 +30,7 @@ const useOCR = (options?: Options) => {
       formData.append("apikey", storedApiKey || ""); // Replace with your OCR API key
       formData.append("language", "eng"); // Specify the OCR language (e.g., "eng" for English)
 
+      console.log("getting ocr")
       const response = await axios.post(ocrApiUrl, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -40,6 +41,7 @@ const useOCR = (options?: Options) => {
 
       if (OCRExitCode === 1) {
         // Successful OCR processing
+        Alert.alert("Succeed", ParsedResults[0].ParsedText);
         setData(ParsedResults);
         if (options?.onSuccess) {
           options.onSuccess(ParsedResults[0].ParsedText);
@@ -54,7 +56,7 @@ const useOCR = (options?: Options) => {
       }
     } catch (err) {
       const errorMessage = (err as Error).message || "An error occurred.";
-      Alert.alert("Error", err?.response?.data || "An error occurred");
+      Alert.alert("Error", JSON.stringify((err as AxiosError)?.response?.data) || "An error occurred");
       setError(errorMessage);
       if (options?.onError) {
         options.onError(errorMessage);

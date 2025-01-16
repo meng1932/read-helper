@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Alert,
   Image,
   SafeAreaView,
@@ -23,6 +24,7 @@ import { extractPageId } from "@/helper/uuid";
 import CameraWindow from "@/components/Camera";
 import useOCR from "@/hooks/useGetOCR";
 import ParallaxScrollView from "@/components/common/ParallaxScrollView";
+import DynamicTextInput from "@/components/common/DynamicTextInput";
 
 interface BookTabData {
   notionPageId?: string;
@@ -75,24 +77,25 @@ export default function BookScreen() {
     </ThemedView>,
     <ThemedView style={styles.step}>
       <ThemedText>Edit the quote</ThemedText>
-      <TextInput
-        style={styles.input}
-        value={quote}
-        onChangeText={(value) => setQuote(value)}
-      />
+      {gettingOcr ? (
+        <ActivityIndicator />
+      ) : (
+        <DynamicTextInput
+          value={quote}
+          onChangeText={(value) => setQuote(value)}
+        />
+      )}
     </ThemedView>,
     <ThemedView style={styles.step}>
       <ThemedText>Edit your comment</ThemedText>
-      <TextInput
-        style={styles.input}
+      <DynamicTextInput
         value={comment}
         onChangeText={(value) => setComment(value)}
       />
     </ThemedView>,
     <ThemedView style={styles.step}>
       <ThemedText>Edit your chapter name (optional)</ThemedText>
-      <TextInput
-        style={styles.input}
+      <DynamicTextInput
         value={chapterName}
         onChangeText={(value) => setChapterName(value)}
       />
@@ -107,11 +110,11 @@ export default function BookScreen() {
     if (bookTabData?.notionPageId && bookTabData?.notionPageId.length) {
       Alert.alert(
         "Submitting",
-       JSON.stringify({
-        quote,
-        comment,
-        notionPageId: extractPageId(bookTabData.notionPageId),
-      })
+        JSON.stringify({
+          quote,
+          comment,
+          notionPageId: extractPageId(bookTabData.notionPageId),
+        })
       );
       console.log("Form submitted:", {
         quote,

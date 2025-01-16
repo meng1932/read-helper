@@ -60,7 +60,7 @@ const CameraWindow = ({
   const compressImage = async (uri: string) => {
     try {
       const manipResult = await ImageManipulator.manipulateAsync(uri, [], {
-        compress: 0.8,
+        compress: 0.7,
         format: ImageManipulator.SaveFormat.JPEG,
       });
 
