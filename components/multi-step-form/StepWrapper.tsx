@@ -1,11 +1,13 @@
-import React from 'react';
-import { View, Button, StyleSheet } from 'react-native';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { Button, ButtonSpinner, ButtonText } from "../ui/button";
 
 interface StepWrapperProps {
   children: React.ReactNode;
   onNext: () => void;
   onPrevious: () => void;
   onCancel: () => void;
+  isSubmitting: boolean;
   isFirstStep: boolean;
   isLastStep: boolean;
 }
@@ -15,6 +17,7 @@ export const StepWrapper: React.FC<StepWrapperProps> = ({
   onNext,
   onPrevious,
   onCancel,
+  isSubmitting,
   isFirstStep,
   isLastStep,
 }) => {
@@ -22,13 +25,21 @@ export const StepWrapper: React.FC<StepWrapperProps> = ({
     <View style={styles.container}>
       <View style={styles.content}>{children}</View>
       <View style={styles.buttonContainer}>
-        <Button title="Cancel" onPress={onCancel} />
-        {!isFirstStep && <Button title="Previous Step" onPress={onPrevious} />}
-        {!isLastStep ? (
-          <Button title="Next Step" onPress={onNext} />
-        ) : (
-          <Button title="Submit" onPress={onNext} />
+        <Button className="p-3" onPress={onCancel} disabled={isSubmitting}>
+          <ButtonText style={styles.buttonText}>Cancel</ButtonText>
+        </Button>
+
+        {!isFirstStep && (
+          <Button className="p-3" onPress={onPrevious} disabled={isSubmitting}>
+            <ButtonText style={styles.buttonText}>Previous</ButtonText>
+          </Button>
         )}
+        <Button className="p-3" onPress={onNext} disabled={isSubmitting}>
+          {isSubmitting && <ButtonSpinner />}
+          <ButtonText style={styles.buttonText}>
+            {isLastStep ? "Submit" : "Next"}
+          </ButtonText>
+        </Button>
       </View>
     </View>
   );
@@ -36,15 +47,19 @@ export const StepWrapper: React.FC<StepWrapperProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  buttonText: {
+    fontSize: 12,
+    lineHeight: 12,
   },
   content: {
-    flex: 1,
+    minHeight: 325,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
   },
 });

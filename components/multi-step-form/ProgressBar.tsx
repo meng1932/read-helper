@@ -1,12 +1,16 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { colors } from "../ui/colors";
 
 interface ProgressBarProps {
   currentStep: number;
   totalSteps: number;
 }
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep, totalSteps }) => {
+export const ProgressBar: React.FC<ProgressBarProps> = ({
+  currentStep,
+  totalSteps,
+}) => {
   return (
     <View style={styles.container}>
       {[...Array(totalSteps)].map((_, index) => (
@@ -26,30 +30,30 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep, totalStep
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 20,
   },
   step: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginHorizontal: 5,
     borderWidth: 2,
   },
   completedStep: {
-    backgroundColor: '#4caf50',
-    borderColor: '#4caf50',
+    backgroundColor: colors.mutsu[200],
+    borderColor: colors.mutsu[300],
   },
   incompleteStep: {
-    backgroundColor: '#fff',
-    borderColor: '#ccc',
+    backgroundColor: "#fff",
+    borderColor: "#ccc",
   },
   stepText: {
-    color: '#000',
-    fontWeight: 'bold',
+    color: "#000",
+    fontWeight: "bold",
   },
 });

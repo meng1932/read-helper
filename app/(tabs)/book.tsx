@@ -1,4 +1,11 @@
-import { Image, StyleSheet, TextInput } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+} from "react-native";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { MultiStepForm } from "@/components/multi-step-form/MultiStepForm";
@@ -16,6 +23,8 @@ import useNotionUpdate from "@/hooks/useUpdateNotionPage";
 import { extractPageId } from "@/helper/uuid";
 import CameraWindow from "@/components/Camera";
 import useOCR from "@/hooks/useGetOCR";
+import ParallaxScrollView from "@/components/common/ParallaxScrollView";
+import DynamicTextInput from "@/components/common/DynamicTextInput";
 
 interface BookTabData {
   notionPageId?: string;
@@ -26,23 +35,20 @@ export default function BookScreen() {
   const [comment, setComment] = useState("");
   const [chapterName, setChapterName] = useState("");
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
-  const {
-    data: bookTabData,
-    loading,
-    error: loadingNotionPageId,
-  } = useAsyncStorageGet<BookTabData>(
-    TABS_FORM_STORAGE_KEY_MAP[TABS.PHYSICAL_BOOK]
-  );
-  const {
-    mutateAsync: updateNotionPage,
-    isLoading: updatingNotion,
-    error: updateNotionError,
-  } = useNotionUpdate();
+  const { data: bookTabData, loading: loadingBookTabData } =
+    useAsyncStorageGet<BookTabData>(
+      TABS_FORM_STORAGE_KEY_MAP[TABS.PHYSICAL_BOOK]
+    );
+  const { mutateAsync: updateNotionPage, isLoading: updatingNotion } =
+    useNotionUpdate({
+      onSuccess: () => {
+        setQuote("");
+        setComment("");
+        setCapturedPhoto(null);
+      },
+    });
 
-  const {
-    mutateAsync: getOCR,
-    isLoading: gettingOcr,
-  } = useOCR({
+  const { mutateAsync: getOCR, isLoading: gettingOcr } = useOCR({
     onSuccess: (data) => {
       setQuote(data);
     },
@@ -60,7 +66,11 @@ export default function BookScreen() {
   const steps = [
     <ThemedView style={styles.step}>
       <ThemedText>Select a book</ThemedText>
-      <BookSelector tab={TABS.PHYSICAL_BOOK} />
+      {loadingBookTabData ? (
+        <ActivityIndicator></ActivityIndicator>
+      ) : (
+        <BookSelector tab={TABS.PHYSICAL_BOOK} />
+      )}
     </ThemedView>,
     <ThemedView style={styles.step}>
       <ThemedText>Select a picture</ThemedText>
@@ -71,24 +81,25 @@ export default function BookScreen() {
     </ThemedView>,
     <ThemedView style={styles.step}>
       <ThemedText>Edit the quote</ThemedText>
-      <TextInput
-        style={styles.input}
-        value={quote}
-        onChangeText={(value) => setQuote(value)}
-      />
+      {gettingOcr ? (
+        <ActivityIndicator />
+      ) : (
+        <DynamicTextInput
+          value={quote}
+          onChangeText={(value) => setQuote(value)}
+        />
+      )}
     </ThemedView>,
     <ThemedView style={styles.step}>
       <ThemedText>Edit your comment</ThemedText>
-      <TextInput
-        style={styles.input}
+      <DynamicTextInput
         value={comment}
         onChangeText={(value) => setComment(value)}
       />
     </ThemedView>,
     <ThemedView style={styles.step}>
       <ThemedText>Edit your chapter name (optional)</ThemedText>
-      <TextInput
-        style={styles.input}
+      <DynamicTextInput
         value={chapterName}
         onChangeText={(value) => setChapterName(value)}
       />
@@ -100,14 +111,21 @@ export default function BookScreen() {
   };
 
   const handleSubmit = () => {
-    
     if (bookTabData?.notionPageId && bookTabData?.notionPageId.length) {
+      Alert.alert(
+        "Submitting",
+        JSON.stringify({
+          quote,
+          comment,
+          notionPageId: extractPageId(bookTabData.notionPageId),
+        })
+      );
       console.log("Form submitted:", {
         quote,
         comment,
         notionPageId: extractPageId(bookTabData.notionPageId),
       });
-      const extractedNotionPageId=extractPageId(bookTabData.notionPageId)
+      const extractedNotionPageId = extractPageId(bookTabData.notionPageId);
       //add to current
       const blocksToPush = [];
       blocksToPush.push(toQuoteBlock(quote));
@@ -116,24 +134,38 @@ export default function BookScreen() {
         blocksToPush.push(toNoteBlock(comment));
       }
       blocksToPush.push(toDividerBlock());
-      updateNotionPage(extractedNotionPageId||"", blocksToPush);
+      updateNotionPage(extractedNotionPageId || "", blocksToPush);
     } else {
       //create a new page
     }
   };
 
   return (
-    <MultiStepForm
-      steps={steps}
-      onCancel={handleCancel}
-      onSubmit={handleSubmit}
-      onStepChange={(stepIndex) => {
-        console.log("Step changed to:", stepIndex);
-        if (stepIndex === 2) {
-          handleOCR();
-        }
-      }}
-    />
+    <ParallaxScrollView
+      headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
+      headerImage={
+        <Image
+          source={require("@/assets/images/bookshelf-bg.png")}
+          style={styles.headerImage}
+        />
+      }
+      //nestedScrollEnabled={true}
+    >
+      <SafeAreaView style={styles.container}>
+        <MultiStepForm
+          steps={steps}
+          isSubmitting={updatingNotion}
+          onCancel={handleCancel}
+          onSubmit={handleSubmit}
+          onStepChange={(stepIndex) => {
+            console.log("Step changed to:", stepIndex);
+            if (stepIndex === 2) {
+              handleOCR();
+            }
+          }}
+        />
+      </SafeAreaView>
+    </ParallaxScrollView>
   );
 }
 
@@ -166,5 +198,13 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     marginBottom: 10,
     borderRadius: 5,
+  },
+  container: {
+    height: "100%",
+  },
+  headerImage: {
+    height: 250,
+    width: "100%",
+    position: "absolute",
   },
 });

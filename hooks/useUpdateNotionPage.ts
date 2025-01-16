@@ -3,20 +3,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NotionBlock } from "@/types/notion";
 import axios, { AxiosError } from "axios";
 import { Alert } from "react-native";
+import { IOptions } from "@/types";
 
-interface Options {
-  onSuccess?: (data: any) => void;
-}
-
-const useNotionUpdate = (options?: Options) => {
+const useNotionUpdate = (options?: IOptions) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<AxiosError |any| null>(null);
+  const [error, setError] = useState<AxiosError | any | null>(null);
   const [data, setData] = useState<any | null>(null);
 
   const mutateAsync = async (pageId: string, blocksToAdd: NotionBlock[]) => {
-   
     try {
-      const storedApiKey = await AsyncStorage.getItem("NOTION_API_KEY");    
+      const storedApiKey = await AsyncStorage.getItem("NOTION_API_KEY");
       setIsLoading(true);
       setError(null);
       //https://cors-anywhere.herokuapp.com/corsdemo
@@ -28,7 +24,7 @@ const useNotionUpdate = (options?: Options) => {
         "Content-Type": "application/json",
         "Notion-Version": "2022-06-28",
         //'Origin': 'your-origin-url', // Replace with your origin URL
-        'x-requested-with': 'XMLHttpRequest', // Add this header
+        "x-requested-with": "XMLHttpRequest", // Add this header
       };
       const response = await axios.patch(
         url,
@@ -45,9 +41,13 @@ const useNotionUpdate = (options?: Options) => {
         "Congratulations! Your data has been submitted successfully."
       );
     } catch (err: any) {
+      Alert.alert("Error", err, err?.response?.data || "An error occurred");
       setError((err as Error).message || "An error occurred");
-      console.error("here is the error: ",err,err?.response?.data || "An error occurred");
-      Alert.alert("Error", "An error occurred");
+      console.error(
+        "here is the error: ",
+        err,
+        err?.response?.data || "An error occurred"
+      );
     } finally {
       setIsLoading(false);
     }
