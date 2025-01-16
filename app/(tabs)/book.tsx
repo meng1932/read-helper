@@ -1,4 +1,10 @@
-import { Image, SafeAreaView, StyleSheet, TextInput } from "react-native";
+import {
+  Alert,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+} from "react-native";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { MultiStepForm } from "@/components/multi-step-form/MultiStepForm";
@@ -99,6 +105,14 @@ export default function BookScreen() {
 
   const handleSubmit = () => {
     if (bookTabData?.notionPageId && bookTabData?.notionPageId.length) {
+      Alert.alert(
+        "Submitting",
+       JSON.stringify({
+        quote,
+        comment,
+        notionPageId: extractPageId(bookTabData.notionPageId),
+      })
+      );
       console.log("Form submitted:", {
         quote,
         comment,
@@ -121,30 +135,29 @@ export default function BookScreen() {
 
   return (
     <ParallaxScrollView
-    headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
-    headerImage={
-      <Image
-        source={require("@/assets/images/bookshelf-bg.png")}
-        style={styles.headerImage}
-      />
-    }
-    //nestedScrollEnabled={true}
-  >
-   <SafeAreaView style={styles.container}>
-      <MultiStepForm
-        steps={steps}
-        onCancel={handleCancel}
-        onSubmit={handleSubmit}
-        onStepChange={(stepIndex) => {
-          console.log("Step changed to:", stepIndex);
-          if (stepIndex === 2) {
-            handleOCR();
-          }
-        }}
-      />
-    </SafeAreaView>
-  </ParallaxScrollView>
-    
+      headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
+      headerImage={
+        <Image
+          source={require("@/assets/images/bookshelf-bg.png")}
+          style={styles.headerImage}
+        />
+      }
+      //nestedScrollEnabled={true}
+    >
+      <SafeAreaView style={styles.container}>
+        <MultiStepForm
+          steps={steps}
+          onCancel={handleCancel}
+          onSubmit={handleSubmit}
+          onStepChange={(stepIndex) => {
+            console.log("Step changed to:", stepIndex);
+            if (stepIndex === 2) {
+              handleOCR();
+            }
+          }}
+        />
+      </SafeAreaView>
+    </ParallaxScrollView>
   );
 }
 
@@ -179,7 +192,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   container: {
-    height:'100%'
+    height: "100%",
   },
   headerImage: {
     height: 250,

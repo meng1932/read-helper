@@ -60,7 +60,7 @@ const CameraWindow = ({
   const compressImage = async (uri: string) => {
     try {
       const manipResult = await ImageManipulator.manipulateAsync(uri, [], {
-        compress: 0.7,
+        compress: 0.8,
         format: ImageManipulator.SaveFormat.JPEG,
       });
 
@@ -94,7 +94,7 @@ const CameraWindow = ({
   return (
     <View style={styles.container}>
       {isCameraActive ? (
-        <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
+        <CameraView ratio='16:9' style={styles.camera} facing={facing} ref={cameraRef}>
           <View style={styles.cameraControls}>
             <TouchableOpacity
               style={styles.controlButton}
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   },
   camera: {
     width: "100%",
-    height: "75%",
+    height: "80%",
   },
   cameraControls: {
     flex: 1,
