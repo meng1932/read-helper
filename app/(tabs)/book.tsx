@@ -25,6 +25,8 @@ import CameraWindow from "@/components/Camera";
 import useOCR from "@/hooks/useGetOCR";
 import ParallaxScrollView from "@/components/common/ParallaxScrollView";
 import DynamicTextInput from "@/components/common/DynamicTextInput";
+import ImagePickerExample from "@/components/ImagePicker";
+import { compressImage } from "@/helper/image";
 
 interface BookTabData {
   notionPageId?: string;
@@ -60,7 +62,8 @@ export default function BookScreen() {
       console.log("No image to process");
       return;
     }
-    await getOCR(imageUri || "");
+    const compressedImage = await compressImage(imageUri);
+    await getOCR(compressedImage || "");
   };
 
   const steps = [
@@ -74,10 +77,7 @@ export default function BookScreen() {
     </ThemedView>,
     <ThemedView style={styles.step}>
       <ThemedText>Select a picture</ThemedText>
-      <CameraWindow
-        capturedPhoto={capturedPhoto}
-        setCapturedPhoto={setCapturedPhoto}
-      />
+      <ImagePickerExample image={capturedPhoto} setImage={setCapturedPhoto} />
     </ThemedView>,
     <ThemedView style={styles.step}>
       <ThemedText>Edit the quote</ThemedText>
