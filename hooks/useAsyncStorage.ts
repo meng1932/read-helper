@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IOptions } from "@/types";
+import { Alert } from "react-native";
 
 /**
  * Hook for getting data from AsyncStorage
@@ -56,12 +57,14 @@ export const useAsyncStorageUpdate = (options?: IOptions) => {
         : newData;
       // Save the updated data back to AsyncStorage
       await AsyncStorage.setItem(storageKey, JSON.stringify(updatedData));
-      if(options?.onSuccess) {
+      if (options?.onSuccess) {
         options.onSuccess(updatedData);
       }
       setError(null);
+      Alert.alert("Success", "Settings notion page id saved");
     } catch (err) {
       console.error(err);
+      Alert.alert("Error", `Failed to update data in ${storageKey} storage.`);
       setError(`Failed to update data in ${storageKey} storage.`);
     } finally {
       setLoading(false);

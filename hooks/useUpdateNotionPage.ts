@@ -41,6 +41,7 @@ const useNotionUpdate = (options?: IOptions) => {
         "Congratulations! Your data has been submitted successfully."
       );
     } catch (err: any) {
+      Alert.alert("Error", "An error occurred");
       Alert.alert("Error", err, err?.response?.data || "An error occurred");
       setError((err as Error).message || "An error occurred");
       console.error(

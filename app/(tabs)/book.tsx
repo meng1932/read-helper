@@ -37,10 +37,13 @@ export default function BookScreen() {
   const [comment, setComment] = useState("");
   const [chapterName, setChapterName] = useState("");
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
-  const { data: bookTabData, loading: loadingBookTabData } =
-    useAsyncStorageGet<BookTabData>(
-      TABS_FORM_STORAGE_KEY_MAP[TABS.PHYSICAL_BOOK]
-    );
+  const {
+    data: bookTabData,
+    loading: loadingBookTabData,
+    reload: refreshBookTabData,
+  } = useAsyncStorageGet<BookTabData>(
+    TABS_FORM_STORAGE_KEY_MAP[TABS.PHYSICAL_BOOK]
+  );
   const { mutateAsync: updateNotionPage, isLoading: updatingNotion } =
     useNotionUpdate({
       onSuccess: () => {
@@ -137,6 +140,14 @@ export default function BookScreen() {
       updateNotionPage(extractedNotionPageId || "", blocksToPush);
     } else {
       //create a new page
+      Alert.alert(
+        "Submitting",
+        JSON.stringify({
+          quote,
+          comment,
+          notionPageId: "no notion page id",
+        })
+      );
     }
   };
 
@@ -161,6 +172,7 @@ export default function BookScreen() {
             console.log("Step changed to:", stepIndex);
             if (stepIndex === 2) {
               handleOCR();
+              refreshBookTabData(); //otherwise the book NOTION PAGE ID will not be refreshed.
             }
           }}
         />
